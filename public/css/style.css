@@ -1,0 +1,75 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+ul {
+  list-style: none;
+}
+
+.container {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  padding-left: 250px;
+}
+
+.header >h1 {
+  padding: 20px 0 10px 10px;
+}
+
+.main {
+  min-height: 500px;
+}
+
+.main-left {
+  float: left;
+  width: 250px;
+  text-align: right;
+  min-height: 500px;
+  /* padding: 0 20px; */
+  /* background-color: #ccc; */
+}
+
+.main-left>.nav {
+  padding: 10px 20px;
+}
+.nav>li{
+  padding: 10px 0;
+}
+
+.main-right {
+  margin-left: 250px;
+  min-height: 500px;
+}
+
+.main-right>.content {
+  padding: 10px 20px;
+  border-top: 1px dotted #ccc;
+}
+
+.footer {
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  bottom: 0px;
+  background-color: orange;
+}
+
+[name=login-form] p {
+  padding: 10px 0;
+}
+
+[name=login-form] .label {
+  display: inline-block;
+  width: 100px;
+}
+
+[name=post-form] p,.text{
+  width: 100%;
+}
+[name=upload-form] p {
+  line-height: 30px;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <% include header.html %>
+
+  <div class="main">
+    <% include side.html %>
+    
+    <div class="main-right">
+      <div class="content">
+      <% include info.html %>
+
+      <% posts.forEach(function(post, index) { %>
+      <p>
+      <h2><%= post.title %></h2>
+      </p>
+      <p class="info">作者：<a href="#"><%= post.name %></a> | 日期：<%= post.time.minute %> | <a href="/u/<%= post.name %>/<%= post.time.day %>/<%= post.title %>">博文连接</a></p>
+      <p><%- post.post %></p>
+      <% }) %>
+      </div>
+    </div>
+  </div>
+  
+
+</div>
+<% include footer.html %>
+</body>
+</html>

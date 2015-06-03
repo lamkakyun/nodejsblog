@@ -1,0 +1,9 @@
+<div class="header">
+  <h1><%= title %></h1>
+  <p><% if (user) { %>
+    welcome you, <%= user.name %>
+    <% } else { %>
+    你还没有登录
+    <% } %>
+  </p>
+</div>

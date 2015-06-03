@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <% include header.html %>
+
+  <div class="main">
+    <% include side.html %>
+    
+    <div class="main-right">
+      <div class="content">
+        <% include info.html %>
+        <form action="/update" method="post" name='post-form'>
+          <input type="hidden" name="postid" value="<%= post._id %>">
+          <p>标题：</p>
+          <p>
+          <input type="text" class="text" value="<%= post.title %>" name="title">
+          </p>
+          <p>正文：</p>
+          <p>
+          <textarea class="text" name="post" rows="25"><%= post.post %></textarea>
+          </p>
+          <p><a href="/upload">上传</a></p>
+          <p>
+          <button type="submit">保存</button>
+          </p>
+        </form>
+      </div>
+    </div>
+
+  </div>
+  
+
+</div>
+<% include footer.html %>
+</body>
+</html>
+

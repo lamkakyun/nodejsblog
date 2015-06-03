@@ -1,0 +1,22 @@
+<div class="main-left">
+  <ul class="nav">
+    <li>
+      <a href="/home">HOME</a>
+    </li>
+    <% if (user) { %>
+    <li>
+      <a href="/post">POST</a>
+    </li>
+    <li>
+      <a href="/logout">LOGOUT</a>
+    </li>
+    <% } else { %>
+    <li>
+      <a href="/login">LOGIN</a>
+    </li>
+    <li>
+      <a href="/register">REGISTER</a>
+    </li>
+    <% } %>
+  </ul>
+</div>
