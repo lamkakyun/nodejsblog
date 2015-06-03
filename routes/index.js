@@ -254,6 +254,24 @@ module.exports = function(app) {
     });
   });
 
+  app.get('/article/:id', function(req, res) {
+    Post.getById(req.params.id, function(err, post) {
+      if (err) {
+        req.flash('error', '找不到博文');
+        return res.redirect('/');
+      }
+
+      res.render('article', {
+        title: post.title,
+        post: post,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+
+    });
+  });
+
   app.get('/edit/:id', common.checkLogin);
   app.get('/edit/:id', function(req, res){
     // console.log(req.params.id + '=====================')

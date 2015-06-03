@@ -183,3 +183,28 @@ Post.remove = function(id, callback) {
     });
   });
 };
+
+
+Post.getById = function(id, callback) {
+  mongodb.open(function(err, db){
+    if (err) {
+      return callback(err);
+    }
+
+    db.collection('posts', function(err, collection){
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+
+      collection.findOne({_id: require('mongodb').ObjectId(id)}, function(err, post){
+        mongodb.close();
+        if (err) {
+          return callback(err);
+        }
+        post.post = markdown.toHTML(post.post);
+        return callback(null, post)
+      });
+    });
+  });
+};
