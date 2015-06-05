@@ -2,7 +2,6 @@
   margin: 0px;
   padding: 0px;
 }
-
 ul {
   list-style: none;
 }
@@ -39,7 +38,9 @@ ul {
 .nav>li{
   padding: 10px 0;
 }
-
+.main {
+  margin-bottom: 30px;
+}
 .main-right {
   margin-left: 250px;
   min-height: 500px;
@@ -48,6 +49,7 @@ ul {
 .main-right>.content {
   padding: 10px 20px;
   border-top: 1px dotted #ccc;
+  overflow: hidden;
 }
 
 .footer {
@@ -72,4 +74,18 @@ ul {
 }
 [name=upload-form] p {
   line-height: 30px;
+}
+
+#comment {
+  margin-top: 15px;
+}
+[name=comment] {
+  width: 100%;
+}
+.comment-detail{
+  margin: 15px 0;
+  border-top: 1px dashed #ccc;
+}
+.page {
+  background-color: #ccc;
 }

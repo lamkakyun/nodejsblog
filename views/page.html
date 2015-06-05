@@ -1,0 +1,11 @@
+<div class="page">
+  totalPage = <%= totalPage %>
+  <% if (!isFirstPage) { %>
+  <a href="?p=1">首页</a>
+  <a href="?p=<%= page -1 %>">上一页</a>
+  <% } %>
+  <% if (!isLastPage) { %>
+  <a href="?p=<%= page +1 %>">下一页</a>
+  <a href="?p=<%= totalPage %>">末页</a>
+  <% } %>
+</div>

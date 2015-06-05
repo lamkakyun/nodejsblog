@@ -1,6 +1,7 @@
 var crypto = require('crypto');
 var User = require('../models/user.js');
 var Post = require('../models/post.js');
+var Comment = require('../models/comment.js');
 var common = require('../common/common.js');
 
 module.exports = function(app) {
@@ -17,21 +18,46 @@ module.exports = function(app) {
   //   });
   // });
 
+  // app.get(['/', '/home'], function(req, res){
+  //   Post.get(null, function(err, posts){
+  //     if (err) {
+  //       posts = [];
+  //     }
+  //     // console.log(posts);
+  
+  //     res.render('home', {
+  //       title: '首页',
+  //       user: req.session.user,
+  //       success: req.flash('success').toString(),
+  //       error: req.flash('error').toString(),
+  //       posts: posts
+  //     });
+  //   })
+  // });
+
   app.get(['/', '/home'], function(req, res){
-    Post.get(null, function(err, posts){
+    var size = 3;
+    var page = /\d+/.test(req.query.p) ? (parseInt(req.query.p) > 0 ? parseInt(req.query.p) : 1) : 1;
+    Post.getPage(null, size, page, function(err, posts, total){
       if (err) {
         posts = [];
       }
-      // console.log(posts);
-  
+
+      var totalPage = total % size == 0 ? total / size : total / size + 1;
+
       res.render('home', {
         title: '首页',
+        page: page,
+        isFirstPage: page == 1,
+        isLastPage: (page -1) * size + posts.length >= total,
+        totalPage: totalPage,
         user: req.session.user,
         success: req.flash('success').toString(),
         error: req.flash('error').toString(),
         posts: posts
       });
-    })
+
+    });
   });
 
   // app.get('/home', function(req, res){
@@ -210,31 +236,80 @@ module.exports = function(app) {
     return res.redirect('/upload');
   });
 
+  // app.get('/u/:name', function(req, res){
+  
+  //   User.get(req.params.name, function(err, user){
+  //     if (!user) {
+  //       req.flash('error', '用户不存在');
+  //       return res.redirect('/');
+  //     }
+
+  //     Post.get(req.params.name, function(err, posts) {
+  //       if (err) {
+  //         req.flash('error', '获取用户博文失败');
+  //         return res.redirect('/');
+  //       }
+
+  //       res.render('user', {
+  //         title: user.name,
+  //         posts: posts,
+  //         user: req.session.user,
+  //         success: req.flash('success').toString(),
+  //         error: req.flash('error').toString()
+  //       });
+  //     });
+
+  //   })
+
+  // });
+
   app.get('/u/:name', function(req, res){
   
-    User.get(req.params.name, function(err, user){
-      if (!user) {
-        req.flash('error', '用户不存在');
-        return res.redirect('/');
+    // User.get(req.params.name, function(err, user){
+    //   if (!user) {
+    //     req.flash('error', '用户不存在');
+    //     return res.redirect('/');
+    //   }
+
+    //   Post.get(req.params.name, function(err, posts) {
+    //     if (err) {
+    //       req.flash('error', '获取用户博文失败');
+    //       return res.redirect('/');
+    //     }
+
+    //     res.render('user', {
+    //       title: user.name,
+    //       posts: posts,
+    //       user: req.session.user,
+    //       success: req.flash('success').toString(),
+    //       error: req.flash('error').toString()
+    //     });
+    //   });
+
+    // });
+
+    var size = 3;
+    var page = /\d+/.test(req.query.p) ? (parseInt(req.query.p) > 0 ? parseInt(req.query.p) : 1) : 1;
+    Post.getPage(req.params.name, size, page, function(err, posts, total){
+      if (err) {
+        posts = [];
       }
 
-      Post.get(req.params.name, function(err, posts) {
-        if (err) {
-          req.flash('error', '获取用户博文失败');
-          return res.redirect('/');
-        }
+      var totalPage = total % size == 0 ? total / size : total / size + 1;
 
-        res.render('user', {
-          title: user.name,
-          posts: posts,
-          user: req.session.user,
-          success: req.flash('success').toString(),
-          error: req.flash('error').toString()
-        });
+      res.render('user', {
+        title: req.params.name,
+        page: page,
+        isFirstPage: page == 1,
+        isLastPage: (page -1) * size + posts.length >= total,
+        totalPage: totalPage,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString(),
+        posts: posts
       });
 
-    })
-
+    });
   });
 
   app.get('/u/:name/:day/:title', function(req, res){
@@ -324,6 +399,29 @@ module.exports = function(app) {
       req.flash('success', '删除文章成功');
       return res.redirect('/');
     });
+  });
+
+  app.post('/comment', function(req, res){
+    if (req.body.comment.trim() == "") {
+      req.flash('error', '评论不能为空');
+      return res.redirect('back');
+    }
+
+    var comment = new Comment(
+      req.body.postid,
+      req.body.comment
+    );
+
+    comment.save(function(err){
+      if (err) {
+        req.flash('error', '保存评论失败');
+        return res.redirect('back');
+      }
+      
+      req.flash('success', '评论成功');
+      return res.redirect('back');
+    });
+
   });
 
 };

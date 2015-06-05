@@ -202,9 +202,46 @@ Post.getById = function(id, callback) {
         if (err) {
           return callback(err);
         }
+        console.log(post);
         post.post = markdown.toHTML(post.post);
         return callback(null, post)
       });
+    });
+  });
+};
+
+
+Post.getPage = function(name, size, page, callback) {
+  mongodb.open(function(err, db){
+    if (err) {
+      return callback(err);
+    }
+
+    db.collection('posts', function(err, collection){
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+  
+      var query = {};
+      if (name) {
+        query.name = name;
+      }
+
+      collection.count(query, function(err, total){
+        collection.find(query, {
+          skip: (page - 1) * size,
+          limit: size
+        }).sort({time: -1}).toArray(function(err, posts){
+          mongodb.close();
+          if (err) {
+            return callback(err);
+          }
+
+          return callback(null, posts, total);
+        });
+      });
+
     });
   });
 };

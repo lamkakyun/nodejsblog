@@ -20,9 +20,10 @@
       <p>
       <h2><%= post.title %></h2>
       </p>
-      <p class="info">作者：<a href="#"><%= post.name %></a> | 日期：<%= post.time.minute %> | <a href="/u/<%= post.name %>/<%= post.time.day %>/<%= post.title %>">博文连接</a></p>
+      <p class="info">作者：<a href="#"><%= post.name %></a> | 日期：<%= post.time.minute %> | <a href="/article/<%= post._id %>">博文连接</a></p>
       <p><%- post.post %></p>
       <% }) %>
+      <% include page.html %>
       </div>
     </div>
   </div>

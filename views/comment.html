@@ -1,0 +1,32 @@
+<div id="comment">
+  <h3>所有评论</h3>
+    <% if(post.comments) { %>
+    <% post.comments.forEach(function(comment, index) { %>
+  <div class="comment-detail">
+    <p class="conment-info"><%= comment.time %></p>
+    <p class="comment-content"><%= comment.comment %></p>
+  </div>
+    <% }) %>
+    <% } %>
+  <form action="/comment" method="post" name="comment-form">
+    <!-- <p> -->
+    <!--   <span class="label">姓名：</span> -->
+    <!--   <input type="text" value="<% if(user) { %><%= user.name %><% } %>" name="name"> -->
+    <!-- </p> -->
+    <!-- <p> -->
+    <!--   <span class="label">邮箱：</span> -->
+    <!--   <input type="text" value="<% if(user) { %><%= user.email %><% } %>" name="email"> -->
+    <!-- </p> -->
+    <!-- <p> -->
+    <!-- <span class="label">网址：</span> -->
+    <!--   <input type="text" value="<% if(user) { %>/u/<%= user.name %><% } %>" name="website"> -->
+    <!-- </p> -->
+    <p>
+      <input type="hidden" value="<%= post._id %>" name="postid">
+      <textarea name="comment" rows="10"></textarea>
+    </p>
+    <p>
+    <button type="submit">留言</button>
+    </p>
+  </form>
+</div>
