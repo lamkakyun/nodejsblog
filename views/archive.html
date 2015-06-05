@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <% include header.html %>
+
+  <div class="main">
+    <% include side.html %>
+    
+    <div class="main-right">
+      <div class="content">
+      <% include info.html %>
+      <h4>存档</h4>
+      <% posts.forEach(function(post, index) { %>
+      <p><%= post.time.year %></p>
+      <p>&nbsp;&nbsp;<%= post.time.day %></p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="/u/<%= post.name %>"><%= post.name %> - <%= post.title %></a>
+      </p>
+      <% }) %>
+      </div>
+    </div>
+  </div>
+  
+
+</div>
+<% include footer.html %>
+</body>
+</html>
+

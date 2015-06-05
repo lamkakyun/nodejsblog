@@ -245,3 +245,28 @@ Post.getPage = function(name, size, page, callback) {
     });
   });
 };
+
+Post.getArchive = function(callback) {
+  mongodb.open(function(err, db){
+    if (err) {
+      return callback(err);
+    }
+
+    db.collection('posts', function(err, collection){
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+
+      collection.find({},{name: 1, title:1, time:1}).sort({time: -1}).toArray(function(err, posts){
+        mongodb.close();
+
+        if (err) {
+          return callback(err);
+        }
+
+        return callback(err, posts);
+      });
+    });
+  })
+};
