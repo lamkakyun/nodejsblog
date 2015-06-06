@@ -214,7 +214,7 @@ Post.getById = function(id, callback) {
             }
           });
         }
-        console.log(post);
+        // console.log(post);
 
         post.post = markdown.toHTML(post.post);
         return callback(null, post)
@@ -337,4 +337,28 @@ Post.getPostByTag = function(tag, callback) {
 };
 
 
+Post.search = function(keyword, callback) {
+  mongodb.open(function(err, db){
+    if (err) {
+      return callback(err);
+    }
 
+    db.collection('posts', function(err, collection) {
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+  
+      var pattern = new RegExp(keyword, 'i');
+      collection.find({title: pattern}).sort({time: -1}).toArray(function(err, posts) {
+        mongodb.close();
+
+        if (err) {
+          return callback(err);
+        }
+
+        return callback(null, posts);
+      });
+    });
+  });
+};

@@ -486,4 +486,22 @@ module.exports = function(app) {
 
   });
 
+  
+  app.get('/search', function(req, res) {
+    Post.search(req.query.keyword, function(err, posts) {
+      if (err) {
+        req.flash('error', '检索失败');
+        return redirect('/');
+      }
+
+      res.render('tagPost', {
+        title: '检索：' + req.query.keyword,
+        posts: posts,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
+  });
+  
 };
