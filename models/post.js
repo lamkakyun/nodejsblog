@@ -25,7 +25,8 @@ Post.prototype.save = function(callback) {
     time: time,
     title: this.title,
     tags: this.tags,
-    post: this.post
+    post: this.post,
+    pv: 0
   };
 
   mongodb.open(function(err, db){
@@ -201,11 +202,20 @@ Post.getById = function(id, callback) {
       }
 
       collection.findOne({_id: require('mongodb').ObjectId(id)}, function(err, post){
-        mongodb.close();
         if (err) {
+          mongodb.close();
           return callback(err);
         }
-        // console.log(post);
+        if (post) {
+          collection.update({_id: require('mongodb').ObjectId(id)}, {$inc: {pv: 1}}, function(err){
+            mongodb.close();
+            if (err){
+              return callback(err);
+            }
+          });
+        }
+        console.log(post);
+
         post.post = markdown.toHTML(post.post);
         return callback(null, post)
       });
