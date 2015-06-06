@@ -44,6 +44,10 @@ app.use(session({
 
 routes(app);
 
+app.use(function(req, res) {
+  res.render("404");
+});
+
 app.listen(app.get('port'), function(){
   console.log('server running on ' + app.get('port'));
 });
