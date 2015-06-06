@@ -190,7 +190,8 @@ module.exports = function(app) {
 
   app.post('/post', common.checkLogin);
   app.post('/post', function(req, res){
-    var post = new Post(req.session.user.name, req.body.title, req.body.post);
+    var tags = [req.body.tag1, req.body.tag2, req.body.tag3];
+    var post = new Post(req.session.user.name, req.body.title, tags, req.body.post);
     
     if (req.body.title.trim() == '') {
       req.flash('error', '标题不能为空');
@@ -370,7 +371,8 @@ module.exports = function(app) {
   
   app.post('/update', common.checkLogin);
   app.post('/update', function(req, res){
-    Post.update(req.body.postid, req.body.title, req.body.post, function(err){
+    var tags = [req.body.tag1, req.body.tag2, req.body.tag3];
+    Post.update(req.body.postid, req.body.title, tags, req.body.post, function(err){
       if (err) {
         req.flash('error', '更新博文失败'); 
         return res.redirect('back');
@@ -440,6 +442,48 @@ module.exports = function(app) {
       })
       
     });
+  });
+
+  app.get('/tags', function(req, res) {
+  
+    Post.getTags(function(err, tags){
+      if (err) {
+        req.flash('error', '没有标签');
+        return res.redirect('/');
+      }
+
+      res.render('tags', {
+        title: '标签',
+        tags: tags,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
+
+  });
+
+  app.get('/tags/:tag', function(req, res) {
+    if (req.params.tag.trim() == '') {
+      req.flash('error', '标签不能为空');
+      return res.redirect('back');
+    }
+
+    Post.getPostByTag(req.params.tag, function(err, posts){
+      if (err) {
+        req.flash('error', '找不到文章');
+        return res.redirect('back');
+      }
+
+      res.render('tagPost', {
+        title: '标签：' + req.params.tag,
+        posts: posts,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
+
   });
 
 };

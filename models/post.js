@@ -1,9 +1,10 @@
 var mongodb = require('./db.js');
 var markdown = require('markdown').markdown;
 
-function Post(name, title, post){
+function Post(name, title, tags, post){
   this.name = name;
   this.title = title;
+  this.tags = tags;
   this.post = post;
 }
 
@@ -23,6 +24,7 @@ Post.prototype.save = function(callback) {
     name: this.name,
     time: time,
     title: this.title,
+    tags: this.tags,
     post: this.post
   };
 
@@ -133,7 +135,7 @@ Post.edit = function(id, callback) {
   })
 };
 
-Post.update = function(id, title, post,  callback) {
+Post.update = function(id, title, tags,  post, callback) {
   mongodb.open(function(err, db){
     if (err) {
       return callback(err);
@@ -147,7 +149,8 @@ Post.update = function(id, title, post,  callback) {
 
       collection.update({_id: require('mongodb').ObjectId(id)}, {$set: {
         title: title,
-        post: post
+        post: post,
+        tags: tags
       }}, function(err){
         if (err) {
           return callback(err);
@@ -202,7 +205,7 @@ Post.getById = function(id, callback) {
         if (err) {
           return callback(err);
         }
-        console.log(post);
+        // console.log(post);
         post.post = markdown.toHTML(post.post);
         return callback(null, post)
       });
@@ -269,4 +272,56 @@ Post.getArchive = function(callback) {
       });
     });
   })
+};
+
+
+Post.getTags = function(callback) {
+  mongodb.open(function(err, db){
+    if (err) {
+      return callback(err);
+    }
+
+    db.collection('posts', function(err, collection){
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+
+      collection.distinct('tags', function(err, tags){
+        mongodb.close();
+
+        if (err) {
+          return callback(err);
+        }
+
+        return callback(null, tags);
+      });
+    });
+  });
+};
+
+
+Post.getPostByTag = function(tag, callback) {
+  mongodb.open(function(err, db){
+    if (err) {
+      return callback(err);
+    }
+
+    db.collection('posts', function(err, collection){
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+
+      collection.find({tags: tag}).sort({time:-1}).toArray(function(err, posts){
+        mongodb.close();
+
+        if (err) {
+          return callback(err);
+        }
+
+        return callback(null, posts);
+      });
+    });
+  });
 };

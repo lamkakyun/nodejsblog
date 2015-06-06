@@ -21,6 +21,12 @@
           <p>
           <input type="text" class="text" value="<%= post.title %>" name="title">
           </p>
+          <p>标签</p>
+          <p>
+          <input type="text" value="<% if (post.tags) { %><%= post.tags[0] %><% } %>" name="tag1">
+            <input type="text" value="<% if (post.tags) { %><%= post.tags[1] %><% } %>" name="tag2">
+            <input type="text" value="<% if (post.tags) { %><%= post.tags[2] %><% } %>" name="tag3">
+          </p>
           <p>正文：</p>
           <p>
           <textarea class="text" name="post" rows="25"><%= post.post %></textarea>

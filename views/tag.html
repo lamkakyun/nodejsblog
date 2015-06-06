@@ -1,0 +1,7 @@
+<% if (post.tags) { %>
+<% post.tags.forEach(function(tag, index) { %>
+<% if (tag){ %>
+<a href="/tags/<%= tag %>"><%= tag %></a>
+<% } %>
+<% }) %>
+<% } %>
