@@ -26,6 +26,7 @@ Post.prototype.save = function(callback) {
     title: this.title,
     tags: this.tags,
     post: this.post,
+    reprint_info: {},
     pv: 0
   };
 
@@ -46,7 +47,8 @@ Post.prototype.save = function(callback) {
           return callback(err);
         }
 
-        return callback(null, post);
+        // console.log(post.ops[0]);
+        return callback(null, post.ops[0]);
       })
     });
 
@@ -164,6 +166,17 @@ Post.update = function(id, title, tags,  post, callback) {
 };
 
 
+
+/* -------------------------------*/
+/** 
+ * @Synopsis 删除文章，if 转载文章 then 删除原文章的reprint_to 
+ * 
+ * @Param id
+ * @Param callback
+ * 
+ * @Returns   
+ */
+/* ---------------------------------*/
 Post.remove = function(id, callback) {
   mongodb.open(function(err, db){
     if (err) {
@@ -176,13 +189,31 @@ Post.remove = function(id, callback) {
         return callback(err);
       }
 
-      collection.remove({_id: require('mongodb').ObjectId(id)}, function(err){
-        if (err) {
+      collection.findOne({_id: require('mongodb').ObjectId(id)}, function(err, post){
+        if (err || !post) {
           mongodb.close();
           return callback(err);
         }
 
-        return callback(null);
+        // del reprint_to info 
+        if (post.reprint_info && post.reprint_info.reprint_from) {
+          var from_id = post.reprint_info.reprint_from;
+          collection.update({_id: require('mongodb').ObjectId(from_id)}, {$pull: {"reprint_info.reprint_to": require('mongodb').ObjectId(id)}}, function(err){
+            if (err) {
+              mongodb.close();
+              return callback(err);
+            }
+          });
+        }
+
+        collection.remove({_id: require('mongodb').ObjectId(id)}, function(err){
+          if (err) {
+            mongodb.close();
+            return callback(err);
+          }
+          return callback(null);
+        });
+
       });
     });
   });
@@ -358,6 +389,80 @@ Post.search = function(keyword, callback) {
         }
 
         return callback(null, posts);
+      });
+    });
+  });
+};
+
+
+
+/* -------------------------------*/
+/** 
+ * @Synopsis 转载文章
+ * 
+ * @Param from_id
+ * @Param callback
+ * 
+ * @Returns   
+ */
+/* ---------------------------------*/
+Post.reprint = function(from_id, to_info, callback) {
+  mongodb.open(function(err, db) {
+    if (err) {
+      return callback(err);
+    }
+
+    db.collection('posts', function(err, collection){
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+
+      collection.findOne({_id: require('mongodb').ObjectId(from_id)}, function(err, post) {
+        if (err) {
+          mongodb.close();
+          return callback(err);
+        }
+
+        var date = new Date();
+
+        var time = {
+          date: date,
+          year: date.getFullYear(),
+          month: date.getFullYear() + "-" + (date.getMonth() + 1),
+          day: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
+          minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : date.getMinutes())
+        };
+        
+        // 创建转载文章
+        delete post._id;
+        post.name = to_info.name;
+        post.time = time;
+        post.title = (post.title.search(/[转载]/) > -1) ? post.title : "[转载]" + post.title;
+        post.comments = [];
+        post.reprint_info = {reprint_from: from_id};
+        post.pv = 0;
+
+        collection.insert(post, {safe: true}, function(err, post){
+          if (err) {
+            mongodb.close();
+            return callback(err);
+          }
+
+          // 更新被转载文章的转载信息
+          collection.update({_id: require('mongodb').ObjectId(from_id)},{$push: {"reprint_info.reprint_to": post.ops[0]._id}}, function(err){
+            mongodb.close();
+            
+            if (err) {
+              return callback(err);
+            }
+
+            return callback(null, post.ops[0]._id);
+          });
+
+        });
+
+
       });
     });
   });

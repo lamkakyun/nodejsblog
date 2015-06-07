@@ -17,9 +17,21 @@
       <% include info.html %>
       <% if (post) { %>
       <p>
-      <h2><%= post.title %></h2>
+      <h2><%= post.title %>
+        <% if (post.reprint_info && post.reprint_info.reprint_from) { %>
+        <a href='/article/<%= post.reprint_info.reprint_from %>'>原文链接</a>
+        <% } %>
+      </h2>
       </p>
-      <p class="info">作者：<a href="/u/<%= post.name %>"><%= post.name %></a> | 日期：<%= post.time.minute %>| <% include tag.html %>  | <a href="/edit/<%= post._id %>">编辑</a> | <a href="/remove/<%= post._id %>">删除</a></p>
+      <p class="info">作者：<a href="/u/<%= post.name %>"><%= post.name %></a> | 日期：<%= post.time.minute %> | 阅读量：<%= post.pv %><% if (post.reprint_info && post.reprint_info.reprint_to) { %> | 转载数量：<%= post.reprint_info.reprint_to.length %><% } %> | <% include tag.html %>  | <a href="/edit/<%= post._id %>">编辑</a> | <a href="/remove/<%= post._id %>">删除</a>
+      <% if (post.reprint_info){ %>
+      <% if(!post.reprint_info.reprint_from && post.name != user.name){ %>
+      | <a href="/reprint/<%= post._id %>">转载</a>
+      <% } %>
+      <% } else { %>
+      | <a href="/reprint/<%= post._id %>">转载</a>
+      <% } %>
+      </p>
       <p><%- post.post %></p>
       <% include comment.html %>
       <% } else { %>

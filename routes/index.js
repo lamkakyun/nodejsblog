@@ -43,7 +43,7 @@ module.exports = function(app) {
         posts = [];
       }
 
-      var totalPage = total % size == 0 ? total / size : total / size + 1;
+      var totalPage = total % size == 0 ? total / size : Math.floor(total / size) + 1;
 
       res.render('home', {
         title: '首页',
@@ -336,6 +336,7 @@ module.exports = function(app) {
         req.flash('error', '找不到博文');
         return res.redirect('/');
       }
+      // console.log(post)
 
       res.render('article', {
         title: post.title,
@@ -504,4 +505,34 @@ module.exports = function(app) {
     });
   });
   
+
+  app.get('/reprint/:postid', common.checkLogin);
+  app.get('/reprint/:postid', function(req, res) {
+    Post.getById(req.params.postid, function(err, post) {
+      if (err) {
+        req.flash('error', '文章不存在');
+        return res.redirect('back');
+      }
+
+      if (post.name == req.session.user.name) {
+        req.flash('error', '这是你的文章不用转载');
+        return res.redirect('back');
+      }
+
+      Post.reprint(req.params.postid, {name: req.session.user.name}, function(err, newpostid) {
+        if (err) {
+          req.flash('error', '转载文章失败');
+          return res.redirect('back');
+        }
+
+        req.flash('success', '转载成功');
+        return res.redirect('/article/' + newpostid);
+
+      });
+
+    });
+  });
+
 };
+
+
