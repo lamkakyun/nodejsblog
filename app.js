@@ -1,5 +1,8 @@
 var express = require('express');
 var logger = require('morgan');
+var fs = require('fs');
+var accessLog = fs.createWriteStream('access.log', {flags: 'a'});
+var errorLog = fs.createWriteStream('error.log', {flags: 'a'});
 var path = require('path');
 var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
@@ -21,11 +24,18 @@ app.set('view engine', 'html');
 app.engine('.html', require('ejs').__express);
 
 app.use(logger('dev'));
+app.use(logger('dev', {stream: accessLog}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(favicon(__dirname + '/public/img/icon/favicon.ico'));
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(function(err, req, res, next) {
+  var meta = '[' + new Date() + ']' + req.url + '\n';
+  errorLog.write(meta + error.stack + '\n');
+  next();
+});
+
 
 app.use(flash());
 
